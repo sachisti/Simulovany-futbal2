@@ -14,10 +14,7 @@ import math
 
 import time
 
-global a
 a = 0
-
-b = 0
 buduceX = 0
 buduceY = 0
 koeficient = 1
@@ -63,7 +60,6 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                 polovica = 0 #ak je nula tak je na nasej polke
                              #ak je jedna tak je na superovej polke
                 
-                
                              
                 #superova brana je x -70
                 #a y je 18 az -18
@@ -82,13 +78,17 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                         loptaY.append(ball_y)
                     
                         
-                    print(loptaX)
-                    print(buduceX) 
+                    print(loptaY)
+                    print(buduceY) 
 
                 
                 global a
                 
                 if a == 0:
+                    if robot_x < 0:
+                        polovica = 1
+                    else:
+                        polovica = 0
                     start_time = time.time()
                     a = 1
                 

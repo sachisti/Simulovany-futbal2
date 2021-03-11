@@ -12,6 +12,7 @@ from rcj_soccer_player_b1 import rcj_soccer_robot, utils
 # Feel free to import built-in libraries
 import math
 
+a = 0
 
 class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
     def run(self):
@@ -50,14 +51,19 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                 ball_x = ball_pos["x"]*100
                 ball_y = ball_pos["y"]*100
                 
-                polovica = 0 #ak je nula tak je na nasej polke
-                             #ak je jedna tak je na superovej polke
+                polovica = 0 #ak je 0 tak sme modry
+                             #ak je 1 tak sme zlty 
                              
                 #superova brana je robot_x -70
                 #a robot_y je 18 az -18
+                global a
                 
-  
-
+                if a == 0:
+                    if robot_x < 0:
+                        polovica = 1
+                    else:
+                        polovica = 0
+                    a = 1
                 
     
                 if robot_x < 25:

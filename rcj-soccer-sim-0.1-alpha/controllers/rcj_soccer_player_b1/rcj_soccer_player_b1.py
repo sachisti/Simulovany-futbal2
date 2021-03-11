@@ -12,6 +12,7 @@ import time
 
 a = 0
 b = 0
+c = 0
 
 class MyRobot(RCJSoccerRobot):
     def run(self):
@@ -48,6 +49,8 @@ class MyRobot(RCJSoccerRobot):
                 ball_x = ball_pos["x"]*100
                 ball_y = ball_pos["y"]*100
                 
+                branaX = 75
+                branaY = 0
                 
                 if ball_x >= 25:
                     if direction == 0:
