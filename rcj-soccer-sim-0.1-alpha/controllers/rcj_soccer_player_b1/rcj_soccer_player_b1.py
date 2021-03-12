@@ -10,9 +10,11 @@ import utils
 import time
 
 
-a = 0
-b = 0
-c = 0
+k = 0
+
+
+robotX = []
+robotY = []
 
 class MyRobot(RCJSoccerRobot):
     def run(self):
@@ -52,81 +54,62 @@ class MyRobot(RCJSoccerRobot):
                 branaX = 75
                 branaY = 0
                 
-                if ball_x >= 25:
-                    if direction == 0:
-                        left_speed = -10
-                        right_speed = -10
-                        global b
-                        b = 0
-                    else:
-                        left_speed = direction * 10
-                        right_speed = direction * -10
+                def get_angles(pos1_x, pos1_y):
+                    pos2_x = 75
+                    pos2_y = 0 
+                    a = pos2_x - pos1_x
+                    b = pos2_y - pos1_y
+                    c = math.sqrt(a**2 + b**2)
+                    alfa = math.degrees(math.asin(a / c))
+                    gama = 90
+                    return alfa
+                  
+                if len(robotX) == 2:
+                    robotX.pop(0)
+                    robotY.pop(0)
+                    robotX.append(int(robot_x))
+                    robotY.append(int(robot_y))
+                    
+                    global k
+                    k = 1
                 else:
-                    if robot_y <= 5:
-                        if robot_y >= -5:
-                            if real_robot_angle <= 274:
-                                if real_robot_angle >= 264:
-                                    if robot_x > 70:
-                                        left_speed = 0
-                                        right_speed = 0
-                                        global a
-                                        if a == 0:
-                                            start_time1 = time.time()
-                                            a = 1
-                                        else:
-                                            if(time.time() - start_time1) > 4:
-                                                if robot_x > 50:
-                                                        left_speed = -10
-                                                        right_speed = -10
-                                                        b = 1
-                                                else:
-                                                    start_time1 = time.time()
-                                                    b = 0
-      
-                                    else:
-                                        if b == 1:
-                                            if robot_x > 50:
-                                                left_speed = -10
-                                                right_spedd = -10
-                                            else:
-                                                
-                                                left_speed = 10
-                                                right_speed = 10
-                                                b = 0
-                                                a = 0
-                                        else:
-                                            left_speed = 10
-                                            right_speed = 10
-                                            b = 0
-                                else:
-                                    left_speed = 3
-                                    right_speed = -3
-                            else:
-                                left_speed = -3
-                                right_speed = 3
-                        else:
-                            if real_robot_angle >= 177:
-                                if real_robot_angle <= 181:
-                                    left_speed = 10
-                                    right_speed = 10
-                                else:
-                                    left_speed = -3
-                                    right_speed = 3
-                            else:
-                                left_speed = 3
-                                right_speed = -3
-                                
+                    robotX.append(int(robot_x))
+                    robotY.append(int(robot_y))
+                    left_speed = 0
+                    right_speed = 0
+                    if robot_y < 0:
+                        uhol = real_robot_angle + 180 - get_angles(robot_x, robot_y)
                     else:
-                        if real_robot_angle >= 176:
-                            if real_robot_angle <= 182:
-                                left_speed = -10
-                                right_speed = -10
-                            else:
-                                left_speed = -3
-                                right_speed = 3
+                        uhol = real_robot_angle - 180 + get_angles(robot_x, robot_y)
+                    print("prepocitavam")
+                   
+                if k == 1:
+                    if robotX[0] == robotX[1] and robotY[0] == robotY[1]:
+                        if real_robot_angle - 2 <= uhol and real_robot_angle + 2 >= uhol:
+                            left_speed = -5
+                            right_speed = -5
+                            print("ideme")
                         else:
-                            left_speed = 3
-                            right_speed = -3
+                            if real_robot_angle < uhol:
+                                left_speed = 1
+                                right_speed = -1
+                                print("dolava")
+                            else:
+                                left_speed = -1
+                                right_speed = 1
+                                print("doprava")
+                            print("tocime sa a nevieme preco")
+                        print(uhol)
+                        print(real_robot_angle)
+                        
+                    else:        
+                        if robot_y < 0:
+                            uhol = real_robot_angle + 180 - get_angles(robot_x, robot_y)
+                        else:
+                            uhol = real_robot_angle - 180 + get_angles(robot_x, robot_y)
+                        print("prepocitavam")
+                
+               
                                                 
                 # Set the speed to motors
                 self.left_motor.setVelocity(left_speed)

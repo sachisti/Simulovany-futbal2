@@ -78,8 +78,7 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                         loptaY.append(ball_y)
                     
                         
-                    print(loptaY)
-                    print(buduceY) 
+                   
 
                 
                 global a
