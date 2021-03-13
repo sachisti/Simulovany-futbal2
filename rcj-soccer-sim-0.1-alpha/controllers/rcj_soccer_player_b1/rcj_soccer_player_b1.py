@@ -12,7 +12,6 @@ import time
 
 k = 0
 
-
 robotX = []
 robotY = []
 
@@ -56,19 +55,25 @@ class MyRobot(RCJSoccerRobot):
                 
                 def get_angles(pos1_x, pos1_y):
                     pos2_x = 75
-                    pos2_y = 0 
+                    pos2_y = 5
+                    if pos1_y < 0:
+                        pos1_y = pos1_y * (-1)
+                    if pos1_x < 0:
+                        pos1_x = pos1_x * (-1)
                     a = pos2_x - pos1_x
                     b = pos2_y - pos1_y
                     c = math.sqrt(a**2 + b**2)
+                    global alfa
                     alfa = math.degrees(math.asin(a / c))
+                    beta = math.degrees(math.asin(b / c))
                     gama = 90
-                    return alfa
-                
+                    return beta
+               
                 def novy_uhol():
                     if robot_y < 0:
-                        u = 90 - get_angles(robot_x, robot_y)
-                    else:
                         u = 90 + get_angles(robot_x, robot_y)
+                    else:
+                        u = 90 - get_angles(robot_x, robot_y)
                     return u
                 
                         
@@ -90,8 +95,8 @@ class MyRobot(RCJSoccerRobot):
                 if k == 1:
                     if robotX[0] == robotX[1] and robotY[0] == robotY[1]:
                         if real_robot_angle - 2 <= uhol and real_robot_angle + 2 >= uhol:
-                            left_speed = -8
-                            right_speed = -8
+                            left_speed = -5
+                            right_speed = -5
                             print("ideme")
                         else:
                             rozdiel = real_robot_angle - uhol
@@ -102,6 +107,8 @@ class MyRobot(RCJSoccerRobot):
                                 left_speed = 2
                                 right_speed = -2
                             print("tocime sa a nevieme preco")
+                        global alfa
+                        print(alfa)
                         print(uhol)
                         print(real_robot_angle)
                         
