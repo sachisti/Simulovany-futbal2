@@ -63,7 +63,15 @@ class MyRobot(RCJSoccerRobot):
                     alfa = math.degrees(math.asin(a / c))
                     gama = 90
                     return alfa
-                  
+                
+                def novy_uhol():
+                    if robot_y < 0:
+                        u = real_robot_angle + 180 - get_angles(robot_x, robot_y)
+                    else:
+                        u = real_robot_angle - 180 + get_angles(robot_x, robot_y)
+                    return u
+                
+                        
                 if len(robotX) == 2:
                     robotX.pop(0)
                     robotY.pop(0)
@@ -77,36 +85,28 @@ class MyRobot(RCJSoccerRobot):
                     robotY.append(int(robot_y))
                     left_speed = 0
                     right_speed = 0
-                    if robot_y < 0:
-                        uhol = real_robot_angle + 180 - get_angles(robot_x, robot_y)
-                    else:
-                        uhol = real_robot_angle - 180 + get_angles(robot_x, robot_y)
-                    print("prepocitavam")
+                    uhol = novy_uhol()
                    
                 if k == 1:
                     if robotX[0] == robotX[1] and robotY[0] == robotY[1]:
-                        if real_robot_angle - 2 <= uhol and real_robot_angle + 2 >= uhol:
-                            left_speed = -5
-                            right_speed = -5
+                        if real_robot_angle - 3 <= uhol and real_robot_angle + 3 >= uhol:
+                            left_speed = -8
+                            right_speed = -8
                             print("ideme")
                         else:
-                            if real_robot_angle < uhol:
-                                left_speed = 1
-                                right_speed = -1
-                                print("dolava")
+                            rozdiel = real_robot_angle - uhol
+                            if rozdiel > 0:
+                                left_speed = -2
+                                right_speed = 2
                             else:
-                                left_speed = -1
-                                right_speed = 1
-                                print("doprava")
+                                left_speed = 2
+                                right_speed = -2
                             print("tocime sa a nevieme preco")
                         print(uhol)
                         print(real_robot_angle)
                         
                     else:        
-                        if robot_y < 0:
-                            uhol = real_robot_angle + 180 - get_angles(robot_x, robot_y)
-                        else:
-                            uhol = real_robot_angle - 180 + get_angles(robot_x, robot_y)
+                        uhol = novy_uhol()
                         print("prepocitavam")
                 
                
