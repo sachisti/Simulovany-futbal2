@@ -66,9 +66,9 @@ class MyRobot(RCJSoccerRobot):
                 
                 def novy_uhol():
                     if robot_y < 0:
-                        u = real_robot_angle + 180 - get_angles(robot_x, robot_y)
+                        u = 90 - get_angles(robot_x, robot_y)
                     else:
-                        u = real_robot_angle - 180 + get_angles(robot_x, robot_y)
+                        u = 90 + get_angles(robot_x, robot_y)
                     return u
                 
                         
@@ -89,7 +89,7 @@ class MyRobot(RCJSoccerRobot):
                    
                 if k == 1:
                     if robotX[0] == robotX[1] and robotY[0] == robotY[1]:
-                        if real_robot_angle - 3 <= uhol and real_robot_angle + 3 >= uhol:
+                        if real_robot_angle - 2 <= uhol and real_robot_angle + 2 >= uhol:
                             left_speed = -8
                             right_speed = -8
                             print("ideme")
