@@ -16,8 +16,9 @@ k = 0
 
 robotX = []
 robotY = []
-
-
+global vl,vr
+vl = 0
+vr = 0
 class MyRobot(RCJSoccerRobot):
     def run(self):
         while self.robot.step(TIME_STEP) != -1:
@@ -90,6 +91,7 @@ class MyRobot(RCJSoccerRobot):
                     robotY.append(int(robot_y))
                     left_speed = 0
                     right_speed = 0
+                    global uhol
                     uhol = novy_uhol()
                 
             
@@ -115,7 +117,24 @@ class MyRobot(RCJSoccerRobot):
                        else:
                            v = 0
                    
-                        
+                def domov():
+                    global uhol, vl, vr
+                    if k == 1:
+                        if robotX[0] == robotX[1] and robotY[0] == robotY[1]:
+                            if real_robot_angle - 2 <= uhol and real_robot_angle + 2 >= uhol:
+                                vl = -7
+                                vr = -7
+                            else:
+                                rozdiel = real_robot_angle - uhol
+                                if rozdiel > 0:
+                                    vl = -2
+                                    vr = 2
+                                else:
+                                    vl = 2
+                                    vr = -2
+                        else:       
+                            uhol = novy_uhol()
+            
                     
 
                 if ball_x < 25:
@@ -130,38 +149,13 @@ class MyRobot(RCJSoccerRobot):
                                 left_speed = -3
                                 right_speed = 3
                         else:
-                            if k == 1:
-                                if robotX[0] == robotX[1] and robotY[0] == robotY[1]:
-                                    if real_robot_angle - 2 <= uhol and real_robot_angle + 2 >= uhol:
-                                        left_speed = -7
-                                        right_speed = -7
-                                    else:
-                                        rozdiel = real_robot_angle - uhol
-                                        if rozdiel > 0:
-                                            left_speed = -2
-                                            right_speed = 2
-                                        else:
-                                            left_speed = 2
-                                            right_speed = -2
-                                else:        
-                                    uhol = novy_uhol()
-                    else:
-                        if k == 1:
-                                if robotX[0] == robotX[1] and robotY[0] == robotY[1]:
-                                    if real_robot_angle - 2 <= uhol and real_robot_angle + 2 >= uhol:
-                                        left_speed = -7
-                                        right_speed = -7
-                                    else:
-                                        rozdiel = real_robot_angle - uhol
-                                        if rozdiel > 0:
-                                            left_speed = -2
-                                            right_speed = 2
-                                        else:
-                                            left_speed = 2
-                                            right_speed = -2
-                                else:        
-                                    uhol = novy_uhol()        
-                            
+                            domov()
+                            left_speed = vl
+                            right_speed = vr
+                    else:       
+                        domov()
+                        left_speed = vl
+                        right_speed = vr  
                                     
                 else:
                     if direction == 0:
@@ -170,7 +164,7 @@ class MyRobot(RCJSoccerRobot):
                     else:
                         left_speed = direction * 8
                         right_speed = direction * -8
-                                       
+                                    
                 # Set the speed to motors
                 self.left_motor.setVelocity(left_speed)
                 self.right_motor.setVelocity(right_speed)
