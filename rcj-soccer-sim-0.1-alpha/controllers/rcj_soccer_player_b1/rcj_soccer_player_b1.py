@@ -96,7 +96,8 @@ class MyRobot(RCJSoccerRobot):
                 
             
                 def cakaj():
-                   global e, f
+                   global e, f, g
+                   g = 1 
                    if e == 0:
                        global start_time, v
                        start_time = time.time()
@@ -106,14 +107,17 @@ class MyRobot(RCJSoccerRobot):
                        if (time.time() - start_time) > 5:
                            if robot_x > 50:
                                v = -6
+                               print("0")
                            else:
                                if f == 0:
                                    start_time = time.time()
-                                   return 0
+                                   v = 0
                                    f = 1
+                                   print("1")
                                else:
                                    if (time.time() - start_time) > 3:
                                        v = 6
+                                       print("2")
                        else:
                            v = 0
                    
@@ -138,26 +142,33 @@ class MyRobot(RCJSoccerRobot):
                     
 
                 if ball_x < 25:
-                    if robot_x < 78 and robot_x > 72:
-                        if robot_y < 5 and robot_x > -5:
-                            if real_robot_angle < 275 and real_robot_angle > 265:
-                                cakaj()
-                                global v
-                                left_speed = v
-                                right_speed = v
+                    if g == 1:
+                        cakaj()
+                        left_speed = v
+                        right_speed = v
+                    else:
+                        if robot_x < 78 and robot_x > 72:
+                            if robot_y < 5 and robot_x > -5:
+                                if real_robot_angle < 275 and real_robot_angle > 265:
+                                    cakaj()
+                                    left_speed = v
+                                    right_speed = v
+                                else:
+                                    left_speed = -3
+                                    right_speed = 3
                             else:
-                                left_speed = -3
-                                right_speed = 3
-                        else:
-                            domov()
-                            left_speed = vl
-                            right_speed = vr
-                    else:       
-                        domov()
-                        left_speed = vl
-                        right_speed = vr  
-                                    
+                                if g == 0:
+                                    domov()
+                                    left_speed = vl
+                                    right_speed = vr
+                        else:       
+                            if g == 0:
+                                domov()
+                                left_speed = vl
+                                right_speed = vr  
+                                        
                 else:
+                    g == 0
                     if direction == 0:
                         left_speed = -8
                         right_speed = -8
