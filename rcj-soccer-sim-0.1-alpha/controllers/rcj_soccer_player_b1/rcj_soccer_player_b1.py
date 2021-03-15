@@ -8,12 +8,15 @@ from rcj_soccer_robot import RCJSoccerRobot, TIME_STEP
 import utils
 
 import time
-
+e = 0
+f = 0
+g = 0
 
 k = 0
 
 robotX = []
 robotY = []
+
 
 class MyRobot(RCJSoccerRobot):
     def run(self):
@@ -41,7 +44,6 @@ class MyRobot(RCJSoccerRobot):
                 #else:
                 #    left_speed = direction * 4
                 #    right_speed = direction * -4
-
                 real_robot_angle = robot_angle*57
                 
                 robot_x = robot_pos["x"]*100
@@ -50,12 +52,10 @@ class MyRobot(RCJSoccerRobot):
                 ball_x = ball_pos["x"]*100
                 ball_y = ball_pos["y"]*100
                 
-                branaX = 75
-                branaY = 0
                 
                 def get_angles(pos1_x, pos1_y):
                     pos2_x = 75
-                    pos2_y = 5
+                    pos2_y = 0
                     if pos1_y < 0:
                         pos1_y = pos1_y * (-1)
                     if pos1_x < 0:
@@ -91,33 +91,86 @@ class MyRobot(RCJSoccerRobot):
                     left_speed = 0
                     right_speed = 0
                     uhol = novy_uhol()
-                   
-                if k == 1:
-                    if robotX[0] == robotX[1] and robotY[0] == robotY[1]:
-                        if real_robot_angle - 2 <= uhol and real_robot_angle + 2 >= uhol:
-                            left_speed = -5
-                            right_speed = -5
-                            print("ideme")
-                        else:
-                            rozdiel = real_robot_angle - uhol
-                            if rozdiel > 0:
-                                left_speed = -2
-                                right_speed = 2
-                            else:
-                                left_speed = 2
-                                right_speed = -2
-                            print("tocime sa a nevieme preco")
-                        global alfa
-                        print(alfa)
-                        print(uhol)
-                        print(real_robot_angle)
-                        
-                    else:        
-                        uhol = novy_uhol()
-                        print("prepocitavam")
                 
-               
-                                                
+            
+                def cakaj():
+                   global e, f
+                   if e == 0:
+                       global start_time, v
+                       start_time = time.time()
+                       e = 1
+                       v = 0
+                   else:
+                       if (time.time() - start_time) > 5:
+                           if robot_x > 50:
+                               v = -6
+                           else:
+                               if f == 0:
+                                   start_time = time.time()
+                                   return 0
+                                   f = 1
+                               else:
+                                   if (time.time() - start_time) > 3:
+                                       v = 6
+                       else:
+                           v = 0
+                   
+                        
+                    
+
+                if ball_x < 25:
+                    if robot_x < 78 and robot_x > 72:
+                        if robot_y < 5 and robot_x > -5:
+                            if real_robot_angle < 275 and real_robot_angle > 265:
+                                cakaj()
+                                global v
+                                left_speed = v
+                                right_speed = v
+                            else:
+                                left_speed = -3
+                                right_speed = 3
+                        else:
+                            if k == 1:
+                                if robotX[0] == robotX[1] and robotY[0] == robotY[1]:
+                                    if real_robot_angle - 2 <= uhol and real_robot_angle + 2 >= uhol:
+                                        left_speed = -7
+                                        right_speed = -7
+                                    else:
+                                        rozdiel = real_robot_angle - uhol
+                                        if rozdiel > 0:
+                                            left_speed = -2
+                                            right_speed = 2
+                                        else:
+                                            left_speed = 2
+                                            right_speed = -2
+                                else:        
+                                    uhol = novy_uhol()
+                    else:
+                        if k == 1:
+                                if robotX[0] == robotX[1] and robotY[0] == robotY[1]:
+                                    if real_robot_angle - 2 <= uhol and real_robot_angle + 2 >= uhol:
+                                        left_speed = -7
+                                        right_speed = -7
+                                    else:
+                                        rozdiel = real_robot_angle - uhol
+                                        if rozdiel > 0:
+                                            left_speed = -2
+                                            right_speed = 2
+                                        else:
+                                            left_speed = 2
+                                            right_speed = -2
+                                else:        
+                                    uhol = novy_uhol()        
+                            
+                                    
+                else:
+                    if direction == 0:
+                        left_speed = -8
+                        right_speed = -8
+                    else:
+                        left_speed = direction * 8
+                        right_speed = direction * -8
+                                       
                 # Set the speed to motors
                 self.left_motor.setVelocity(left_speed)
                 self.right_motor.setVelocity(right_speed)
