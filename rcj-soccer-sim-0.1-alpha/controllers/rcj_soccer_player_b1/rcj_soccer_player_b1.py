@@ -104,22 +104,28 @@ class MyRobot(RCJSoccerRobot):
                        e = 1
                        v = 0
                    else:
-                       if (time.time() - start_time) > 5:
-                           if robot_x > 50:
-                               v = -6
-                               print("0")
-                           else:
-                               if f == 0:
-                                   start_time = time.time()
+                       if f == 1:
+                           if (time.time() - start_time) > 3:
+                               if robot_x < 78 and robot_x > 72:
+                                   g = 0
+                                   e = 0
+                                   f = 0
                                    v = 0
-                                   f = 1
-                                   print("1")
-                               else:
-                                   if (time.time() - start_time) > 3:
-                                       v = 6
-                                       print("2")
+                               else:    
+                                   v = 6
                        else:
-                           v = 0
+                           if (time.time() - start_time) > 5:
+                               if robot_x > 48:
+                                   v = -6
+                                   print("0")
+                               else:
+                                   if f == 0:
+                                       start_time = time.time()
+                                       v = 0
+                                       f = 1
+                                       print("1")
+                           else:
+                               v = 0
                    
                 def domov():
                     global uhol, vl, vr
@@ -139,14 +145,17 @@ class MyRobot(RCJSoccerRobot):
                         else:       
                             uhol = novy_uhol()
             
-                    
-
+                
+                        
+                
                 if ball_x < 25:
-                    if g == 1:
+                    global g
+                    if robot_x > 0 and g == 1:
                         cakaj()
                         left_speed = v
                         right_speed = v
                     else:
+                        g = 0
                         if robot_x < 78 and robot_x > 72:
                             if robot_y < 5 and robot_x > -5:
                                 if real_robot_angle < 275 and real_robot_angle > 265:
@@ -168,13 +177,14 @@ class MyRobot(RCJSoccerRobot):
                                 right_speed = vr  
                                         
                 else:
-                    g == 0
+                    g = 0
                     if direction == 0:
                         left_speed = -8
                         right_speed = -8
                     else:
                         left_speed = direction * 8
                         right_speed = direction * -8
+                
                                     
                 # Set the speed to motors
                 self.left_motor.setVelocity(left_speed)
