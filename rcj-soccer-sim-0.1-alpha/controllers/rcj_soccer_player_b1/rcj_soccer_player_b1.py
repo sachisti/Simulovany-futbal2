@@ -117,13 +117,11 @@ class MyRobot(RCJSoccerRobot):
                            if (time.time() - start_time) > 5:
                                if robot_x > 48:
                                    v = -6
-                                   print("0")
                                else:
                                    if f == 0:
                                        start_time = time.time()
                                        v = 0
                                        f = 1
-                                       print("1")
                            else:
                                v = 0
                    
