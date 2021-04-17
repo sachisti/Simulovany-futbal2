@@ -77,6 +77,25 @@ class MyRobot(RCJSoccerRobot):
                         u = 90 - get_angles(robot_x, robot_y)
                     return u
                 
+                def sanca():
+                    if ball_x < 1 and ball_x > -1 and ball_y < 1 and ball_y > -1:
+                        if direction == 0:
+                            vl = -8
+                            vr = -8
+                        else:
+                            vl = direction * 8
+                            vr = direction * -8
+                
+                def lokalizacia():
+                    if ball_y < 15 and ball_y > -15:
+                        lokalita = "stred"
+                    else:
+                        if ball_y < 0:
+                            lokalita = "vpravo"
+                        else:
+                            lokalita = "vlavo"
+                            
+                    return lokalita
                         
                 if len(robotX) == 2:
                     robotX.pop(0)
@@ -176,13 +195,22 @@ class MyRobot(RCJSoccerRobot):
                                         
                 else:
                     g = 0
-                    if direction == 0:
-                        left_speed = -8
-                        right_speed = -8
+                    if lokalizacia() == "stred":
+                        if direction == 0:
+                            left_speed = -8
+                            right_speed = -8
+                        else:
+                            left_speed = direction * 8
+                            right_speed = direction * -8
                     else:
-                        left_speed = direction * 8
-                        right_speed = direction * -8
+                        if lokalizacia() == "vpravo":
+                            left_speed = -10
+                            right_speed = -5
+                        else:
+                            left_speed = -5
+                            right_speed = -10
                 
+
                                     
                 # Set the speed to motors
                 self.left_motor.setVelocity(left_speed)

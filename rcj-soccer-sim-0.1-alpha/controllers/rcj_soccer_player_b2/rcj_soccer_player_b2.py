@@ -43,7 +43,6 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                 #    left_speed = direction * 4
                 #    right_speed = direction * -4
 
-
                 real_robot_angle = robot_angle*57
                 
 
@@ -85,7 +84,8 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                     return beta
                 
                 def zisti_ci_mas_loptu():
-                    if robot_x > ball_x and robot_x - 5 > ball_x and robot_y + 3 < ball_y and robot_y - 3 > ball_y:
+                    if robot_x > ball_x and robot_x - 7 < ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
+                        print("mam")
                         return 1
                     else:
                         return 0
@@ -125,9 +125,17 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                             left_speed = direction * 10
                             right_speed = direction * -10
                     else:
-                        navigacia()
-                        left_speed = vl
-                        right_speed = vr
+                        if ball_y > -10 and ball_y < 10:
+                            navigacia()
+                            left_speed = vl
+                            right_speed = vr
+                        else:
+                            if ball_y < 0:
+                                left_speed = -5
+                                right_speed = -10
+                            else:
+                                left_speed = -10
+                                right_speed = -5
                 else:
                     if real_robot_angle <= 274:
                         if real_robot_angle >= 264: 
