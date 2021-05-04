@@ -60,7 +60,7 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                     if polovica == 1:
                         pos2_x = -75
                     else:
-                        pos2_x = -75
+                        pos2_x = 75
                     pos2_y = 0
                     if pos1_y < 0:
                         pos1_y = pos1_y * (-1)
@@ -77,17 +77,15 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                 
                 def zisti_ci_mas_loptu():
                     if polovica == 1:
-                        if robot_x > ball_x and robot_x - 7 < ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
-                            print("mam")
+                        if robot_x < ball_x and robot_x + 5 > ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
                             return 1
                         else:
                             return 0
                     else:
-                        if robot_x < ball_x and robot_x + 7 > ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
-                            print("mam")
+                        if robot_x > ball_x and robot_x - 5 < ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
                             return 1
                         else:
-                            return 0
+                            return 0 
                     
                                         
                 def navigacia():
@@ -128,6 +126,7 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                                 left_speed = direction * 10
                                 right_speed = direction * -10
                         else:
+                            print("mamy2")
                             if ball_y > -10 and ball_y < 10:
                                 navigacia()
                                 left_speed = vl

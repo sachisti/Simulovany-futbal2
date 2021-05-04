@@ -100,15 +100,13 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                     return beta
                 
                 def zisti_ci_mas_loptu():
-                    if polovica == 1:
-                        if robot_x > ball_x and robot_x - 7 < ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
-                            print("mam")
+                    if polovica == -1:
+                        if robot_x < ball_x and robot_x + 5 > ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
                             return 1
                         else:
                             return 0
                     else:
-                        if robot_x < ball_x and robot_x + 7 > ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
-                            print("mam")
+                        if robot_x > ball_x and robot_x - 5 < ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
                             return 1
                         else:
                             return 0   
@@ -166,6 +164,7 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                                     left_speed = direction * 10
                                     right_speed = direction * -10
                             else:
+                                print("mamb3")
                                 if ball_y > -10 and ball_y < 10:
                                     navigacia()
                                     left_speed = vl
