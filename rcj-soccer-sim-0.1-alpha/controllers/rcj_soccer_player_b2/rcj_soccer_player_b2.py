@@ -52,23 +52,15 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                 ball_x = ball_pos["x"]*100
                 ball_y = ball_pos["y"]*100
                 
-                polovica = 0 #ak je 0 tak sme modry
-                             #ak je 1 tak sme zlty 
-                             
-                #superova brana je robot_x -70
-                #a robot_y je 18 az -18
-                global a
                 
-                if a == 0:
-                    if robot_x < 0:
-                        polovica = 1
-                    else:
-                        polovica = 0
-                    a = 1
+                brana_x = -75
                 
     
                 def get_angles(pos1_x, pos1_y):
-                    pos2_x = -75
+                    if polovica == 1:
+                        pos2_x = -75
+                    else:
+                        pos2_x = -75
                     pos2_y = 0
                     if pos1_y < 0:
                         pos1_y = pos1_y * (-1)
@@ -84,11 +76,18 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                     return beta
                 
                 def zisti_ci_mas_loptu():
-                    if robot_x > ball_x and robot_x - 7 < ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
-                        print("mam")
-                        return 1
+                    if polovica == 1:
+                        if robot_x > ball_x and robot_x - 7 < ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
+                            print("mam")
+                            return 1
+                        else:
+                            return 0
                     else:
-                        return 0
+                        if robot_x < ball_x and robot_x + 7 > ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
+                            print("mam")
+                            return 1
+                        else:
+                            return 0
                     
                                         
                 def navigacia():
@@ -100,56 +99,92 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                     if real_robot_angle + 4 >= cielovy_uhol and real_robot_angle - 4 <= cielovy_uhol:
                         vr = 10
                         vl = 10
-                        print("k")
                     else: 
                         if real_robot_angle < cielovy_uhol:
                             vr = -5
                             vl = 5
-                            print("0")
                         else:
                             vr = 5
                             vl = -5
-                            print("1")
                         
                     
                 
-                  
-
-                         
-                if robot_x < 20:
-                    if zisti_ci_mas_loptu() == 0:
-                        if direction == 0:
-                            left_speed = -10
-                            right_speed = -10
-                        else:
-                            left_speed = direction * 10
-                            right_speed = direction * -10
+                global a
+                
+                if a == 0:
+                    if robot_x < 0:
+                        polovica = -1
                     else:
-                        if ball_y > -10 and ball_y < 10:
-                            navigacia()
-                            left_speed = vl
-                            right_speed = vr
-                        else:
-                            if ball_y < 0:
-                                left_speed = -5
+                        polovica = 1
+                    a = 1      
+                
+                if polovica == 1:                       
+                    if robot_x < 20:
+                        if zisti_ci_mas_loptu() == 0:
+                            if direction == 0:
+                                left_speed = -10
                                 right_speed = -10
                             else:
-                                left_speed = -10
-                                right_speed = -5
-                else:
-                    if real_robot_angle <= 274:
-                        if real_robot_angle >= 264: 
-                            left_speed = -10
-                            right_speed = -10
+                                left_speed = direction * 10
+                                right_speed = direction * -10
                         else:
-                            left_speed = 3
-                            right_speed = -3
+                            if ball_y > -10 and ball_y < 10:
+                                navigacia()
+                                left_speed = vl
+                                right_speed = vr
+                            else:
+                                if ball_y < 0:
+                                    left_speed = -5
+                                    right_speed = -10
+                                else:
+                                    left_speed = -10
+                                    right_speed = -5
                     else:
-                        left_speed = -3
-                        right_speed = 3
+                        if real_robot_angle <= 274:
+                            if real_robot_angle >= 264: 
+                                left_speed = -10
+                                right_speed = -10
+                            else:
+                                left_speed = 3
+                                right_speed = -3
+                        else:
+                            left_speed = -3
+                            right_speed = 3
+                            
+                else:
+                    if robot_x > -25:
+                        if zisti_ci_mas_loptu() == 0:
+                            if direction == 0:
+                                left_speed = -10
+                                right_speed = -10
+                            else:
+                                left_speed = direction * 10
+                                right_speed = direction * -10
+                        else:
+                            if ball_y > -10 and ball_y < 10:
+                                navigacia()
+                                left_speed = vl
+                                right_speed = vr
+                            else:
+                                if ball_y < 0:
+                                    left_speed = -5
+                                    right_speed = -10
+                                else:
+                                    left_speed = -10
+                                    right_speed = -5
+                    else:
+                        if real_robot_angle <= 274:
+                            if real_robot_angle >= 264: 
+                                left_speed = 10
+                                right_speed = 10
+                            else:
+                                left_speed = 3
+                                right_speed = -3
+                        else:
+                            left_speed = -3
+                            right_speed = 3      
+                    
                 
-                
-
                 # Set the speed to motors
                 self.left_motor.setVelocity(left_speed)
                 self.right_motor.setVelocity(right_speed)

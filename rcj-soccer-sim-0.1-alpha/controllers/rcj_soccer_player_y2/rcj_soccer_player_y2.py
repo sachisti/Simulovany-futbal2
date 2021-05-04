@@ -1,687 +1,193 @@
+# rcj_soccer_player controller - ROBOT B2
+
+###### REQUIRED in order to import files from B1 controller
 import sys
 from pathlib import Path
 sys.path.append(str(Path('.').absolute().parent))
+# You can now import scripts that you put into the folder with your
+# robot B1 controller
+from rcj_soccer_player_b1 import rcj_soccer_robot, utils
+######
 
-# Warning This code is very poorly written but it works and due to the shortage time it must be enough
+# Feel free to import built-in libraries
 import math
-from team_014_libraries.robot1 import rcj_soccer_robot
 
-def angle_ball(robot_angle,x_1,x_2,y_1,y_2):
-    angle = math.degrees(math.atan2(y_1 - y_2,x_1 - x_2))
-    angle = angle + 180
-    rotation = math.degrees(robot_angle)+90
-    if rotation < 0:
-        rotation += 360
-    angle += rotation
-    if  angle  > 360:
-        angle -= 360
-    angle -= 360   
-    angle *= -1
-    if angle>180:
-        angle -=360
-    return angle
-def distance(x_1,x_2,y_1,y_2):
-    a = ((x_1-x_2)*(x_1-x_2))+((y_1-y_2)*(y_1-y_2))
-    return math.sqrt(a)
-stop_counter = 0
+a = 0
+vr = 0
+vl = 0
+
 class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
     def run(self):
         while self.robot.step(rcj_soccer_robot.TIME_STEP) != -1:
             if self.is_new_data():
-                atack = False
-                self.name = self.robot.getName()
                 data = self.get_new_data()
+
                 # Get the position of our robot
                 robot_pos = data[self.name]
                 # Get the position of the ball
                 ball_pos = data['ball']
-                robot_angle = robot_pos['orientation']
-                #print(self.name)
-                if self.name == 'Y2' or self.name == 'Y3':
-                    r_shift =  0.12
-                    KP_ball = 0.4
-                    KP_ball_near = 0.4
-                    KP_goal_centring = 10
-                    ball_shift = 0.12
-                    ball_shift_lr = 0.12
-                    down_shift_tolerance = 0.05
-                    goal_position_x = 0.75 
-                    goal_position_y = 0
-                    max_spd = 10 
-                    
-                    #Ball
-                    ball_goal_angle = math.degrees(math.atan((ball_pos['y'])/(ball_pos['x']-0.73)))
-                    if ball_goal_angle > 0:     
-                        ball_goal_angle = 90-ball_goal_angle
+
+                # Get angle between the robot and the ball
+                # and between the robot and the north
+                ball_angle, robot_angle = self.get_angles(ball_pos, robot_pos)
+
+                # Compute the speed for motors
+                direction = utils.get_direction(ball_angle)
+
+                # If the robot has the ball right in front of it, go forward,
+                # rotate otherwise
+                #if direction == 0:
+                #    left_speed = -5
+                #    right_speed = -5
+                #else:
+                #    left_speed = direction * 4
+                #    right_speed = direction * -4
+
+                real_robot_angle = robot_angle*57
+                
+
+                robot_x = robot_pos["x"]*100
+                robot_y = robot_pos["y"]*100
+                
+                ball_x = ball_pos["x"]*100
+                ball_y = ball_pos["y"]*100
+                
+                
+                brana_x = -75
+                
+    
+                def get_angles(pos1_x, pos1_y):
+                    if polovica == 1:
+                        pos2_x = -75
                     else:
-                        ball_goal_angle = -(90+ball_goal_angle)
-                    #print(ball_goal_angle)
-                    
-                    a_shift = math.sin(math.radians(ball_goal_angle))* r_shift #y
-                    b_shift = math.cos(math.radians(ball_goal_angle))* r_shift #x
-                    #print(a_shift,b_shift)
-                    ball_x = 0
-                    ball_y = 0 
-                    
-                    if robot_pos['x']-down_shift_tolerance>ball_pos['x']:
-                        #robot nad loptou
-                        if ball_pos['y']>0:
-                            ball_x = ball_pos['x']
-                            ball_y = ball_pos['y']-ball_shift_lr
+                        pos2_x = -75
+                    pos2_y = 0
+                    if pos1_y < 0:
+                        pos1_y = pos1_y * (-1)
+                    if pos1_x < 0:
+                        pos1_x = pos1_x * (-1)
+                    a = pos2_x - pos1_x
+                    b = pos2_y - pos1_y
+                    c = math.sqrt(a**2 + b**2)
+                    global alfa
+                    alfa = math.degrees(math.asin(a / c))
+                    beta = math.degrees(math.asin(b / c))
+                    gama = 90
+                    return beta
+                
+                def zisti_ci_mas_loptu():
+                    if polovica == 1:
+                        if robot_x > ball_x and robot_x - 7 < ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
+                            print("mam")
+                            return 1
                         else:
-                            ball_x = ball_pos['x']
-                            ball_y = ball_pos['y']+ball_shift_lr
-                        #print('nad')
+                            return 0
                     else:
-                        #robot je pod loptou
-                        #print('pod')
-                        if ball_pos['x'] > 0:
-                            if ball_pos['y'] >0:
-                                #right up
-                                ideal_ball_x = ball_pos['x']+a_shift
-                                ideal_ball_y = ball_pos['y']+b_shift
-                            else:
-                                #left up
-                                ideal_ball_x = ball_pos['x']-a_shift
-                                ideal_ball_y = ball_pos['y']-b_shift
+                        if robot_x < ball_x and robot_x + 7 > ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
+                            print("mam")
+                            return 1
                         else:
-                            if ball_pos['y'] > 0:
-                                #right down
-                                ideal_ball_x = ball_pos['x']+a_shift
-                                ideal_ball_y = ball_pos['y']+b_shift
-                            else:
-                                #left down
-                                ideal_ball_x = ball_pos['x']-a_shift
-                                ideal_ball_y = ball_pos['y']-b_shift
-                               
-                        ball_x = ideal_ball_x
-                        ball_y = ideal_ball_y
-                    #smerovi vector
-                    s_x = robot_pos['x'] - ball_pos['x']
-                    s_y = robot_pos['y'] - ball_pos['y']
-                    #normalovi vector
-                    n_x = s_y
-                    n_y = s_x * -1
-                    #vseobecne vijadrenie priamky
-                    c = (n_x * ball_pos['x'] + n_y * robot_pos['y']) * -1
+                            return 0
                     
-                    v = abs(n_x * goal_position_x + n_y * goal_position_y + c) 
-                    v = v/(math.sqrt(n_x*n_x + n_y*n_y))
-                    if robot_pos['x']> ball_pos['x']:
-                        v = 100
-                    #print(v)
-                    
-                    ball_angle = angle_ball(robot_angle, ball_x,robot_pos['x'],ball_y,robot_pos['y'])
-                    ball_distance = distance(ball_x,robot_pos['x'],ball_y,robot_pos['y'])
-                    #print(v)
-                    
-                    if v > 0.3:
-                        atack = False
-                    if v > 0.1 and not atack:
-                        
-                        if ball_angle > 0: 
-                            left_speed  = -max_spd + ball_angle * KP_ball
-                            right_speed= -max_spd 
-                        else:
-                            left_speed = -max_spd 
-                            right_speed = -max_spd - ball_angle * KP_ball
+                                        
+                def navigacia():
+                    if robot_y > 0:
+                        cielovy_uhol = 90 + get_angles(robot_x, robot_y)
                     else:
-                        atack = True
-                        #print('point')
-                        ball_angle = angle_ball(robot_angle, ball_pos['x'],robot_pos['x'],ball_pos['y'],robot_pos['y'])
-                        if ball_angle > 0: 
-                            left_speed  = -max_spd + ball_angle * KP_ball_near
-                            right_speed= -max_spd 
+                        cielovy_uhol = 90 - get_angles(robot_x, robot_y)
+                    global vr, vl
+                    if real_robot_angle + 4 >= cielovy_uhol and real_robot_angle - 4 <= cielovy_uhol:
+                        vr = 10
+                        vl = 10
+                    else: 
+                        if real_robot_angle < cielovy_uhol:
+                            vr = -5
+                            vl = 5
                         else:
-                            left_speed = -max_spd 
-                            right_speed = -max_spd - ball_angle * KP_ball_near
-                        #left_speed = 0 
-                        #right_speed = 0
-                            
-                        if robot_pos['x']<0:
-                            #napravo
-                            left_speed = left_speed + (v * KP_goal_centring)
-                        else:
-                            #nalavo
-                            right_speed = right_speed + (v * KP_goal_centring)
-                            
-                        #print(v * KP_goal_centring)
-                    # Set the speed to motors
-                    left_speed = max(left_speed,-10)
-                    left_speed = min(left_speed,10)
-                    right_speed = max(right_speed,-10)
-                    right_speed = min(right_speed,10)
-                    #print(robot_pos['x'])
-                    
-                    self.left_motor.setVelocity(left_speed)
-                    self.right_motor.setVelocity(right_speed)
-                    #print(left_speed,right_speed)
-                elif self.name == 'Y1':
-                    atack = False
-                    KP_ball = 0.4
-                    #steepness = 0.526
-                    steepness = 0.8
-                    max_spd = 10
-                    atack = False
-                    r_shift =  0.12
-                    KP_ball_near = 0.4
-                    KP_goal_centring = 10
-                    ball_shift = 0.12
-                    ball_shift_lr = 0.12
-                    down_shift_tolerance = 0.05
-                    goal_position_x = 0.75 
-                    goal_position_y = 0
-                    max_spd = 10
-                    atack = False
-                    
-                    robot_goal_distance = distance(-0.85, robot_pos['x'],0,robot_pos['y'])
-                    ball_goal_distance = distance(-0.85, ball_pos['x'],0,ball_pos['y'])
-                    #print('momental distance')
-                    #print(robot_goal_distance,ball_goal_distance)
-                    #print('momental distance')
-                    if ball_goal_distance < robot_goal_distance and robot_goal_distance < 0.4:
-                        #print('atacking mode')
-                        #Ball
-                        ball_goal_angle = math.degrees(math.atan((ball_pos['y'])/(ball_pos['x']-0.73)))
-                        if ball_goal_angle > 0:     
-                            ball_goal_angle = 90-ball_goal_angle
-                        else:
-                            ball_goal_angle = -(90+ball_goal_angle)
-                        #print(ball_goal_angle)
+                            vr = 5
+                            vl = -5
                         
-                        a_shift = math.sin(math.radians(ball_goal_angle))* r_shift #y
-                        b_shift = math.cos(math.radians(ball_goal_angle))* r_shift #x
-                        #print(a_shift,b_shift)
-                        ball_x = 0
-                        ball_y = 0 
-                        
-                        if robot_pos['x']-down_shift_tolerance>ball_pos['x']:
-                            #robot nad loptou
-                            if ball_pos['y']>0:
-                                ball_x = ball_pos['x']
-                                ball_y = ball_pos['y']-ball_shift_lr
+                    
+                
+                global a
+                
+                if a == 0:
+                    if robot_x < 0:
+                        polovica = -1
+                    else:
+                        polovica = 1
+                    a = 1      
+                
+                if polovica == 1:                       
+                    if robot_x < 20:
+                        if zisti_ci_mas_loptu() == 0:
+                            if direction == 0:
+                                left_speed = -10
+                                right_speed = -10
                             else:
-                                ball_x = ball_pos['x']
-                                ball_y = ball_pos['y']+ball_shift_lr
-                            #print('nad')
+                                left_speed = direction * 10
+                                right_speed = direction * -10
                         else:
-                            #robot je pod loptou
-                            #print('pod')
-                            if ball_pos['x'] > 0:
-                                if ball_pos['y'] >0:
-                                    #right up
-                                    ideal_ball_x = ball_pos['x']+a_shift
-                                    ideal_ball_y = ball_pos['y']+b_shift
+                            if ball_y > -10 and ball_y < 10:
+                                navigacia()
+                                left_speed = vl
+                                right_speed = vr
+                            else:
+                                if ball_y < 0:
+                                    left_speed = -5
+                                    right_speed = -10
                                 else:
-                                    #left up
-                                    ideal_ball_x = ball_pos['x']-a_shift
-                                    ideal_ball_y = ball_pos['y']-b_shift
-                            else:
-                                if ball_pos['y'] > 0:
-                                    #right down
-                                    ideal_ball_x = ball_pos['x']+a_shift
-                                    ideal_ball_y = ball_pos['y']+b_shift
-                                else:
-                                    #left down
-                                    ideal_ball_x = ball_pos['x']-a_shift
-                                    ideal_ball_y = ball_pos['y']-b_shift
-                                   
-                            ball_x = ideal_ball_x
-                            ball_y = ideal_ball_y
-                        #smerovi vector
-                        s_x = robot_pos['x'] - ball_pos['x']
-                        s_y = robot_pos['y'] - ball_pos['y']
-                        #normalovi vector
-                        n_x = s_y
-                        n_y = s_x * -1
-                        #vseobecne vijadrenie priamky
-                        c = (n_x * ball_pos['x'] + n_y * robot_pos['y']) * -1
-                        
-                        v = abs(n_x * goal_position_x + n_y * goal_position_y + c) 
-                        v = v/(math.sqrt(n_x*n_x + n_y*n_y))
-                        if robot_pos['x']> ball_pos['x']:
-                            v = 100
-                        #print(v)
-                        
-                        ball_angle = angle_ball(robot_angle, ball_x,robot_pos['x'],ball_y,robot_pos['y'])
-                        ball_distance = distance(ball_x,robot_pos['x'],ball_y,robot_pos['y'])
-                        #print(v)
-                        if v > 0.3:
-                            atack = False
-                        if v > 0.1 and not atack:
-                            
-                            if ball_angle > 0: 
-                                left_speed  = -max_spd + ball_angle * KP_ball
-                                right_speed= -max_spd 
-                            else:
-                                left_speed = -max_spd 
-                                right_speed = -max_spd - ball_angle * KP_ball
-                        else:
-                            atack = True
-                            #print('point')
-                            ball_angle = angle_ball(robot_angle, ball_pos['x'],robot_pos['x'],ball_pos['y'],robot_pos['y'])
-                            if ball_angle > 0: 
-                                left_speed  = -max_spd + ball_angle * KP_ball_near
-                                right_speed= -max_spd 
-                            else:
-                                left_speed = -max_spd 
-                                right_speed = -max_spd - ball_angle * KP_ball_near
-                            #left_speed = 0 
-                            #right_speed = 0
-                                
-                            if robot_pos['x']<0:
-                                #napravo
-                                left_speed = left_speed + (v * KP_goal_centring)
-                            else:
-                                #nalavo
-                                right_speed = right_speed + (v * KP_goal_centring)
-                                
-                            #print(v * KP_goal_centring)
-                        # Set the speed to motors
-                        left_speed = max(left_speed,-10)
-                        left_speed = min(left_speed,10)
-                        right_speed = max(right_speed,-10)
-                        right_speed = min(right_speed,10)
-                        #print(robot_pos['x'])
-                        
-                        self.left_motor.setVelocity(left_speed)
-                        self.right_motor.setVelocity(right_speed)
-                        #print(left_speed,right_speed)
+                                    left_speed = -10
+                                    right_speed = -5
                     else:
-                        #defense_curve
-                        #-0.526* x^2 - 0.5 = y
-                        fake_x = ball_pos['y']*-1
-                        fake_y = ball_pos['x']*-1
-                        #smerovi vector
-                        s_x = 0 - fake_x 
-                        s_y = 0.85 - fake_y 
-                        #normalovi vector
-                        n_x = s_y
-                        n_y = s_x * -1
-                        
-                        if n_y == 0:
-                            n_y = 0.000000001
-                        if n_x == 0:
-                            n_x = 0.000000001
-                        #vseobecne vijadrenie priamky
-                        c = (n_x * fake_x  + n_y *  fake_y )*-1
-                        #priesecnik
-                        #-0.526* x^2 - 0.5  = y
-                        #(n_x/n_y *-1))(n * x + (c/(ny*-1)) = y
-                        a = steepness
-                        b = -((n_x/(n_y *-1)))
-                        c = 0.5 - (c/(n_y*-1))
-                        D = math.sqrt((b*b)-(4*a*c))
-                        x_1 = (-b +D)/(2*a)
-                        x_2 = (-b -D)/(2*a)
-                        y_1 = steepness*(x_1*x_1)+0.5
-                        y_2 = steepness*(x_2*x_2)+0.5
-                        
-                        distance_1 = math.sqrt(((fake_x-x_1)*(fake_x-x_1)) + ((fake_y-y_1)*(fake_y-y_1)))
-                        distance_2 = math.sqrt(((fake_x-x_2)*(fake_x-x_2)) + ((fake_y-y_2)*(fake_y-y_2)))
-                        if distance_1 < distance_2:
-                            real_intersection_x = y_1 * -1
-                            real_intersection_y = x_1 * -1
+                        if real_robot_angle <= 274:
+                            if real_robot_angle >= 264: 
+                                left_speed = -10
+                                right_speed = -10
+                            else:
+                                left_speed = 3
+                                right_speed = -3
                         else:
-                            real_intersection_x = y_2 * -1
-                            real_intersection_y = x_2 * -1
+                            left_speed = -3
+                            right_speed = 3
                             
-                        intersection_angle = angle_ball(robot_angle, real_intersection_x,robot_pos['x'],real_intersection_y,robot_pos['y'])
-                        intersection_distance = distance(real_intersection_x,robot_pos['x'],real_intersection_y,robot_pos['y'])
-                        if real_intersection_y > robot_pos['y'] :      
-                            if intersection_angle > 0: 
-                                    left_speed  = -max_spd + intersection_angle * KP_ball
-                                    right_speed= -max_spd 
-                            else:
-                                left_speed = -max_spd 
-                                right_speed = -max_spd - intersection_angle * KP_ball
-                            #print('asdasdasd')
-                            #print(left_speed,right_speed)
-                        else:
-                            intersection_angle += 180
-                            if  intersection_angle > 180:
-                                intersection_angle -= 360
-                            if intersection_angle > 0: 
-                                left_speed  = max_spd 
-                                right_speed= max_spd - intersection_angle * KP_ball
-                            else:
-                                left_speed = max_spd + intersection_angle * KP_ball
-                                right_speed = max_spd 
-                        if intersection_distance<0.01:
-                            left_speed  = 0
-                            right_speed= 0
-                            
-                        if (left_speed == 0 and left_speed == 0):
-                            stop_counter += 1
-                        else:
-                            stop_counter = 0
-                        if stop_counter > 10:
-                            left_speed = 10
-                            right_speed = 10
-                        if stop_counter > 12:    
-                            stop_counter = 0
-                        left_speed = max(left_speed,-10)
-                        left_speed = min(left_speed,10)
-                        right_speed = max(right_speed,-10)
-                        right_speed = min(right_speed,10)
-                        self.left_motor.setVelocity(left_speed)
-                        self.right_motor.setVelocity(right_speed)
-                        #print(intersection_angle )
-                elif self.name == 'B2' or self.name == 'B3':
-                    r_shift =  0.12
-                    KP_ball = 0.4
-                    KP_ball_near = 0.4
-                    KP_goal_centring = 10
-                    ball_shift = 0.12
-                    ball_shift_lr = 0.12
-                    down_shift_tolerance = 0.05
-                    goal_position_x = -0.75 
-                    goal_position_y = 0
-                    max_spd = 10
-                    atack = False
-                   
-                    #Ball
-                    ball_goal_angle = math.degrees(math.atan((ball_pos['y'])/(ball_pos['x']+0.73)))
-                    if ball_goal_angle > 0:     
-                        ball_goal_angle = 90-ball_goal_angle
-                    else:
-                        ball_goal_angle = -(90+ball_goal_angle)
-                    #print(ball_goal_angle)
-                    a_shift = math.sin(math.radians(ball_goal_angle))* r_shift #y
-                    b_shift = math.cos(math.radians(ball_goal_angle))* r_shift #x
-                    
-                    ball_x = 0
-                    ball_y = 0 
-                        
-                    if robot_pos['x']+down_shift_tolerance<ball_pos['x']:
-                        #robot nad loptou
-                        if ball_pos['y']<0:
-                            ball_x = ball_pos['x']
-                            ball_y = ball_pos['y']+ball_shift_lr
-                        else:
-                            ball_x = ball_pos['x']
-                            ball_y = ball_pos['y']-ball_shift_lr
-                    else:
-                        #robot je pod loptou
-                        if ball_pos['x'] > 0:
-                            if ball_pos['y'] > 0:
-                                #left down
-                                ideal_ball_x = ball_pos['x']+a_shift
-                                ideal_ball_y = ball_pos['y']+b_shift
-                            else:
-                                #right down
-                                ideal_ball_x = ball_pos['x']-a_shift
-                                ideal_ball_y = ball_pos['y']-b_shift
-                        else:
-                            if ball_pos['y'] > 0:
-                                #top left
-                                ideal_ball_x = ball_pos['x']+a_shift
-                                ideal_ball_y = ball_pos['y']+b_shift
-                            else:
-                                ideal_ball_x = ball_pos['x']-a_shift
-                                ideal_ball_y = ball_pos['y']-b_shift
-                                #top right
-                        ball_x = ideal_ball_x
-                        ball_y = ideal_ball_y
-                    #smerovi vector
-                    s_x = robot_pos['x'] - ball_pos['x']
-                    s_y = robot_pos['y'] - ball_pos['y']
-                    #normalovi vector
-                    n_x = s_y
-                    n_y = s_x * -1
-                    #vseobecne vijadrenie priamky
-                    c = (n_x * ball_pos['x'] + n_y * robot_pos['y']) * -1
-                    
-                    v = abs(n_x * goal_position_x + n_y * goal_position_y + c) 
-                    v = v/(math.sqrt(n_x*n_x + n_y*n_y))
-                    if robot_pos['x']< ball_pos['x']:
-                        v = 100
-                    #print(v)
-                    
-                    ball_angle = angle_ball(robot_angle, ball_x,robot_pos['x'],ball_y,robot_pos['y'])
-                    ball_distance = distance(ball_x,robot_pos['x'],ball_y,robot_pos['y'])
-                    #print(v)
-                    if v > 0.3:
-                        atack = False
-                    if v > 0.19 and not atack:
-                        
-                        if ball_angle > 0: 
-                            left_speed  = -max_spd + ball_angle * KP_ball
-                            right_speed= -max_spd 
-                        else:
-                            left_speed = -max_spd 
-                            right_speed = -max_spd - ball_angle * KP_ball
-                    else:
-                        atack = True
-                        #print('point')
-                        ball_angle = angle_ball(robot_angle, ball_pos['x'],robot_pos['x'],ball_pos['y'],robot_pos['y'])
-                        if ball_angle > 0: 
-                            left_speed  = -max_spd + ball_angle * KP_ball_near
-                            right_speed= -max_spd 
-                        else:
-                            left_speed = -max_spd 
-                            right_speed = -max_spd - ball_angle * KP_ball_near
-                        #left_speed = 0 
-                        #right_speed = 0
-                            
-                        if robot_pos['x']<0:
-                            #napravo
-                            left_speed = left_speed + (v * KP_goal_centring)
-                        else:
-                            #nalavo
-                            right_speed = right_speed + (v * KP_goal_centring)
-                            
-                        #print(v * KP_goal_centring)
-                    # Set the speed to motors
-                    left_speed = max(left_speed,-10)
-                    left_speed = min(left_speed,10)
-                    right_speed = max(right_speed,-10)
-                    right_speed = min(right_speed,10)
-                    self.left_motor.setVelocity(left_speed)
-                    self.right_motor.setVelocity(right_speed)
-                    #print(left_speed,right_speed)
-                elif self.name == 'B1':
-                    KP_ball = 0.4
-                    
-                    #steepness = -0.526
-                    steepness = -0.8
-                    max_spd = 10
-                    atack = False
-                    r_shift =  0.12
-                    KP_ball_near = 0.4
-                    KP_goal_centring = 10
-                    ball_shift = 0.12
-                    ball_shift_lr = 0.12
-                    down_shift_tolerance = 0.05
-                    goal_position_x = -0.75 
-                    goal_position_y = 0
-                    max_spd = 10 
-                        
-                    robot_goal_distance = distance(0.85, robot_pos['x'],0,robot_pos['y'])
-                    ball_goal_distance = distance(0.85, ball_pos['x'],0,ball_pos['y'])
-                    if ball_goal_distance < robot_goal_distance and robot_goal_distance < 0.4:
-                        #print('atacking mode')
-                        ball_goal_angle = math.degrees(math.atan((ball_pos['y'])/(ball_pos['x']+0.73)))
-                        if ball_goal_angle > 0:     
-                            ball_goal_angle = 90-ball_goal_angle
-                        else:
-                            ball_goal_angle = -(90+ball_goal_angle)
-                        #print(ball_goal_angle)
-                        a_shift = math.sin(math.radians(ball_goal_angle))* r_shift #y
-                        b_shift = math.cos(math.radians(ball_goal_angle))* r_shift #x
-                        
-                        ball_x = 0
-                        ball_y = 0 
-                        
-                        if robot_pos['x']+down_shift_tolerance<ball_pos['x']:
-                            #robot nad loptou
-                            if ball_pos['y']<0:
-                                ball_x = ball_pos['x']
-                                ball_y = ball_pos['y']+ball_shift_lr
-                            else:
-                                ball_x = ball_pos['x']
-                                ball_y = ball_pos['y']-ball_shift_lr
-                        else:
-                            #robot je pod loptou
-                            if ball_pos['x'] > 0:
-                                if ball_pos['y'] > 0:
-                                    #left down
-                                    ideal_ball_x = ball_pos['x']+a_shift
-                                    ideal_ball_y = ball_pos['y']+b_shift
-                                else:
-                                    #right down
-                                    ideal_ball_x = ball_pos['x']-a_shift
-                                    ideal_ball_y = ball_pos['y']-b_shift
-                            else:
-                                if ball_pos['y'] > 0:
-                                    #top left
-                                    ideal_ball_x = ball_pos['x']+a_shift
-                                    ideal_ball_y = ball_pos['y']+b_shift
-                                else:
-                                    ideal_ball_x = ball_pos['x']-a_shift
-                                    ideal_ball_y = ball_pos['y']-b_shift
-                                    #top right
-                            ball_x = ideal_ball_x
-                            ball_y = ideal_ball_y
-                        #smerovi vector
-                        s_x = robot_pos['x'] - ball_pos['x']
-                        s_y = robot_pos['y'] - ball_pos['y']
-                        #normalovi vector
-                        n_x = s_y
-                        n_y = s_x * -1
-                        #vseobecne vijadrenie priamky
-                        c = (n_x * ball_pos['x'] + n_y * robot_pos['y']) * -1
-                        
-                        v = abs(n_x * goal_position_x + n_y * goal_position_y + c) 
-                        v = v/(math.sqrt(n_x*n_x + n_y*n_y))
-                        if robot_pos['x']< ball_pos['x']:
-                            v = 100
-                        #print(v)
-                        
-                        ball_angle = angle_ball(robot_angle, ball_x,robot_pos['x'],ball_y,robot_pos['y'])
-                        ball_distance = distance(ball_x,robot_pos['x'],ball_y,robot_pos['y'])
-                        #print(v)
-                        if v > 0.3:
-                            atack = False
-                        if v > 0.19 and not atack:
-                            
-                            if ball_angle > 0: 
-                                left_speed  = -max_spd + ball_angle * KP_ball
-                                right_speed= -max_spd 
-                            else:
-                                left_speed = -max_spd 
-                                right_speed = -max_spd - ball_angle * KP_ball
-                        else:
-                            atack = True
-                            #print('point')
-                            ball_angle = angle_ball(robot_angle, ball_pos['x'],robot_pos['x'],ball_pos['y'],robot_pos['y'])
-                            if ball_angle > 0: 
-                                left_speed  = -max_spd + ball_angle * KP_ball_near
-                                right_speed= -max_spd 
-                            else:
-                                left_speed = -max_spd 
-                                right_speed = -max_spd - ball_angle * KP_ball_near
-                            #left_speed = 0 
-                            #right_speed = 0
-                                
-                            if robot_pos['x']<0:
-                                #napravo
-                                left_speed = left_speed + (v * KP_goal_centring)
-                            else:
-                                #nalavo
-                                right_speed = right_speed + (v * KP_goal_centring)
-                                
-                            #print(v * KP_goal_centring)
-                        # Set the speed to motors
-                        left_speed = max(left_speed,-10)
-                        left_speed = min(left_speed,10)
-                        right_speed = max(right_speed,-10)
-                        right_speed = min(right_speed,10)
-                        self.left_motor.setVelocity(left_speed)
-                        self.right_motor.setVelocity(right_speed)
-                        #print(left_speed,right_speed)
-                    else:    
-                        #-0.526* x^2 - 0.5 = y
-                        fake_x = ball_pos['y']*-1
-                        fake_y = ball_pos['x']*-1
-                        #smerovi vector
-                        s_x = 0 - fake_x 
-                        s_y = -0.85 - fake_y 
-                        #normalovi vector
-                        n_x = s_y
-                        n_y = s_x * -1
-                        
-                        if n_y == 0:
-                            n_y = 0.000000001
-                        if n_x == 0:
-                            n_x = 0.000000001
-                        #vseobecne vijadrenie priamky
-                        c = (n_x * fake_x  + n_y *  fake_y )*-1
-                        #priesecnik
-                        #-0.526* x^2 - 0.5  = y
-                        #(n_x/n_y *-1))(n * x + (c/(ny*-1)) = y
-                        a = steepness
-                        b = -((n_x/(n_y *-1)))
-                        c = -0.5 - (c/(n_y*-1))
-                        D = math.sqrt((b*b)-(4*a*c))
-                        x_1 = (-b +D)/(2*a)
-                        x_2 = (-b -D)/(2*a)
-                        y_1 = steepness*(x_1*x_1)-0.5
-                        y_2 = steepness*(x_2*x_2)-0.5
-                        
-                        distance_1 = math.sqrt(((fake_x-x_1)*(fake_x-x_1)) + ((fake_y-y_1)*(fake_y-y_1)))
-                        distance_2 = math.sqrt(((fake_x-x_2)*(fake_x-x_2)) + ((fake_y-y_2)*(fake_y-y_2)))
-                        if distance_1 < distance_2:
-                            real_intersection_x = y_1 * -1
-                            real_intersection_y = x_1 * -1
-                        else:
-                            real_intersection_x = y_2 * -1
-                            real_intersection_y = x_2 * -1
-                            
-                        intersection_angle = angle_ball(robot_angle, real_intersection_x,robot_pos['x'],real_intersection_y,robot_pos['y'])
-                        intersection_distance = distance(real_intersection_x,robot_pos['x'],real_intersection_y,robot_pos['y'])
-                        if real_intersection_y > robot_pos['y'] :      
-                            if intersection_angle > 0: 
-                                    left_speed  = -max_spd + intersection_angle * KP_ball
-                                    right_speed= -max_spd 
-                            else:
-                                left_speed = -max_spd 
-                                right_speed = -max_spd - intersection_angle * KP_ball
-                            #print('asdasdasd')
-                            #print(left_speed,right_speed)
-                        else:
-                            intersection_angle += 180
-                            if  intersection_angle > 180:
-                                intersection_angle -= 360
-                            if intersection_angle > 0: 
-                                left_speed  = max_spd 
-                                right_speed= max_spd - intersection_angle * KP_ball
-                            else:
-                                left_speed = max_spd + intersection_angle * KP_ball
-                                right_speed = max_spd 
-                        if intersection_distance<0.01:
-                            left_speed  = 0
-                            right_speed= 0
-                        
-                        left_speed = max(left_speed,-10)
-                        left_speed = min(left_speed,10)
-                        right_speed = max(right_speed,-10)
-                        right_speed = min(right_speed,10)
-                        if (right_speed == 0 and left_speed == 0):
-                            stop_counter += 1
-                        else:
-                            stop_counter = 0
-                        if stop_counter > 10:
-                            left_speed = 10
-                            right_speed = 10
-                        if stop_counter > 12:    
-                            stop_counter = 0
-                        self.left_motor.setVelocity(left_speed)
-                        self.right_motor.setVelocity(right_speed)
-                        #print(intersection_angle )
                 else:
-                    pass
-               
-            
+                    if robot_x > -25:
+                        if zisti_ci_mas_loptu() == 0:
+                            if direction == 0:
+                                left_speed = -10
+                                right_speed = -10
+                            else:
+                                left_speed = direction * 10
+                                right_speed = direction * -10
+                        else:
+                            if ball_y > -10 and ball_y < 10:
+                                navigacia()
+                                left_speed = vl
+                                right_speed = vr
+                            else:
+                                if ball_y < 0:
+                                    left_speed = -5
+                                    right_speed = -10
+                                else:
+                                    left_speed = -10
+                                    right_speed = -5
+                    else:
+                        if real_robot_angle <= 274:
+                            if real_robot_angle >= 264: 
+                                left_speed = 10
+                                right_speed = 10
+                            else:
+                                left_speed = 3
+                                right_speed = -3
+                        else:
+                            left_speed = -3
+                            right_speed = 3     
+                    
+                # Set the speed to motors
+                self.left_motor.setVelocity(left_speed)
+                self.right_motor.setVelocity(right_speed)
+
+
 my_robot = MyRobot()
 my_robot.run()
