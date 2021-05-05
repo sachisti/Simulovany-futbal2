@@ -84,7 +84,7 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                     if polovica == 1:
                         pos2_x = -75
                     else:
-                        pos2_y = 75
+                        pos2_x = 75
                     pos2_y = 0
                     if pos1_y < 0:
                         pos1_y = pos1_y * (-1)

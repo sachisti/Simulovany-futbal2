@@ -15,7 +15,6 @@ import math
 import time
 
 a = 0
-b = 0
 buduceX = 0
 buduceY = 0
 koeficient = 1
@@ -85,7 +84,7 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                     if polovica == 1:
                         pos2_x = -75
                     else:
-                        pos2_y = 75
+                        pos2_x = 75
                     pos2_y = 0
                     if pos1_y < 0:
                         pos1_y = pos1_y * (-1)
@@ -138,16 +137,11 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                         polovica = -1
                     else:
                         polovica = 1
+                    start_time = time.time()
                     a = 1
                 
-                global b
-                    
-                if a == 1 and b == 0:
-                    start_time = time.time()
-                    b = 1
-                
                 if ball_x > 75 or ball_x < -75:
-                    b = 0
+                    a = 0
                   
                 if (time.time() - start_time) < 4:
                     if direction == 0:
@@ -170,6 +164,7 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                                     left_speed = direction * 10
                                     right_speed = direction * -10
                             else:
+                                print("mamy3")
                                 if ball_y > -10 and ball_y < 10:
                                     navigacia()
                                     left_speed = vl
@@ -203,7 +198,6 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                                     left_speed = direction * 10
                                     right_speed = direction * -10
                             else:
-                                print("mamy3")
                                 if ball_y > -10 and ball_y < 10:
                                     navigacia()
                                     left_speed = vl
@@ -225,8 +219,8 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                                     right_speed = -3
                             else:
                                 left_speed = -3
-                                right_speed = 3      
-         
+                                right_speed = 3     
+                                         
                 # Set the speed to motors
                 self.left_motor.setVelocity(left_speed)
                 self.right_motor.setVelocity(right_speed)

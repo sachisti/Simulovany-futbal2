@@ -76,7 +76,7 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                     return beta
                 
                 def zisti_ci_mas_loptu():
-                    if polovica == -1:
+                    if polovica == 1:
                         if robot_x < ball_x and robot_x + 5 > ball_x and robot_y + 4 > ball_y and robot_y - 4 < ball_y:
                             return 1
                         else:
@@ -181,9 +181,8 @@ class MyRobot(rcj_soccer_robot.RCJSoccerRobot):
                                 right_speed = -3
                         else:
                             left_speed = -3
-                            right_speed = 3      
+                            right_speed = 3     
                     
-                
                 # Set the speed to motors
                 self.left_motor.setVelocity(left_speed)
                 self.right_motor.setVelocity(right_speed)
